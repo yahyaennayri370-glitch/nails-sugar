@@ -1060,26 +1060,33 @@ function BookingSection({ services }: { services: Service[] }) {
           <div className={`booking-step ${step === 1 ? 'active' : ''}`}>
             <h3 style={{ marginBottom: 'var(--space-lg)', textAlign: 'center' }}>Choisissez votre prestation</h3>
             <div className="booking__service-list">
-              {services.map(service => (
-                <div
-                  key={service.id}
-                  className={`booking__service-option ${selectedService?.id === service.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedService(service)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && setSelectedService(service)}
-                >
-                  <div className="booking__service-option-info">
-                    <div className="booking__service-option-name">{service.name}</div>
-                    <div className="booking__service-option-meta">
-                      {formatDuration(service.duration)} · {formatPrice(service.price, service.priceOnDemand)}
+              {services.map(service => {
+                const isSelected = !!selectedService && (
+                  (!!selectedService.id && !!service.id && selectedService.id === service.id) ||
+                  (!selectedService.id && selectedService.name === service.name)
+                );
+
+                return (
+                  <div
+                    key={service.id || service.name}
+                    className={`booking__service-option ${isSelected ? 'selected' : ''}`}
+                    onClick={() => setSelectedService(service)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setSelectedService(service)}
+                  >
+                    <div className="booking__service-option-info">
+                      <div className="booking__service-option-name">{service.name}</div>
+                      <div className="booking__service-option-meta">
+                        {formatDuration(service.duration)} · {formatPrice(service.price, service.priceOnDemand)}
+                      </div>
+                    </div>
+                    <div className="booking__service-option-check">
+                      {isSelected && <Check size={14} />}
                     </div>
                   </div>
-                  <div className="booking__service-option-check">
-                    {selectedService?.id === service.id && <Check size={14} />}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="booking__nav">
               <button

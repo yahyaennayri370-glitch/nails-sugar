@@ -2,6 +2,7 @@ import { prisma } from './prisma';
 
 export const DEFAULT_SERVICES = [
   {
+    id: 'svc-manucure',
     name: 'Manucure',
     description: 'Manucure classique avec soin des cuticules, limage et mise en forme des ongles.',
     fullDescription: 'La manucure classique chez Nails Sugar est un soin complet dédié à la santé et à l\'élégance naturelle de vos mains. Elle comprend un diagnostic personnalisé de l\'ongle, le retrait des peaux mortes, un limage précis selon la forme souhaitée, le soin des cuticules à l\'huile nourrissante et un massage relaxant.',
@@ -16,9 +17,11 @@ export const DEFAULT_SERVICES = [
     aftercare: 'Appliquer de l\'huile cuticule tous les soirs, Hydrater quotidiennement les mains',
     idealFor: 'Un entretien régulier des ongles, Hommes et femmes recherchant un soin net, Première expérience en institut',
     expectedResult: 'Des ongles parfaitement dessinés, lisses et brillants avec des cuticules idéales et des mains douces.',
+    active: true,
     sortOrder: 1,
   },
   {
+    id: 'svc-pose-gel',
     name: 'Pose de gel',
     description: 'Pose complète de gel pour des ongles résistants et un rendu naturel ou glamour.',
     fullDescription: 'La pose de gel est la prestation phare pour obtenir des ongles longs, résistants et parfaitement sculptés. Que vous souhaitiez un effet naturel Nude ou un style plus affirmé, le gel offre une tenue longue durée à toute épreuve avec une brillance miroir.',
@@ -33,9 +36,11 @@ export const DEFAULT_SERVICES = [
     aftercare: 'Éviter d\'utiliser vos ongles comme outils, Ne jamais arracher le gel soi-même, Hydrater les cuticules',
     idealFor: 'Ongles fragiles ou cassants, Événements importants et mariages, Personnes souhaitant des ongles impeccables 1 mois',
     expectedResult: 'Une manucure bombée, ultra-résistante avec une brillance effet miroir sans aucun écaillement.',
+    active: true,
     sortOrder: 2,
   },
   {
+    id: 'svc-vernis-semi',
     name: 'Vernis semi-permanent',
     description: 'Application de vernis semi-permanent longue tenue avec un fini brillant impeccable.',
     fullDescription: 'Le vernis semi-permanent combine la simplicité d\'un vernis classique et la tenue prolongée du gel. Séché sous lampe LED, il sèche instantanément et garantit des ongles colorés et éclatants sans ternir.',
@@ -50,9 +55,11 @@ export const DEFAULT_SERVICES = [
     aftercare: 'Porter des gants pour le ménage avec produits chimiques, Ne pas gratter le vernis',
     idealFor: 'Usage quotidien actif, Départs en vacances et week-ends, Celles qui aiment changer régulièrement de couleur',
     expectedResult: 'Une couleur intense, séchée immédiatement, sans bavure ni rayure pendant plusieurs semaines.',
+    active: true,
     sortOrder: 3,
   },
   {
+    id: 'svc-nail-art',
     name: 'Nail art',
     description: 'Designs personnalisés et créatifs pour des ongles uniques à votre image.',
     fullDescription: 'Exprimez votre style avec notre service de Nail Art personnalisé. Motifs géométriques, French moderne, paillettes, effets marbre, feuilles d\'or ou incrustations : chaque ongle devient une véritable œuvre d\'art.',
@@ -67,9 +74,11 @@ export const DEFAULT_SERVICES = [
     aftercare: 'Protéger les ongles des chocs directs, Hydrater régulièrement les mains',
     idealFor: 'Mariages, anniversaires et événements spéciaux, Amoureuses de tendances et de mode, Personnalisation unique',
     expectedResult: 'Un design créatif et minutieux correspondant exactement à vos inspirations avec des lignes nettes.',
+    active: true,
     sortOrder: 4,
   },
   {
+    id: 'svc-extensions',
     name: 'Extensions',
     description: 'Extensions d\'ongles pour une longueur et une forme parfaites selon vos envies.',
     fullDescription: 'Sublimez vos mains avec des extensions d\'ongles sur chablon ou capsules pour ajouter de la longueur et modifier la forme selon vos envies (Amande, Coffin, Carré, Stiletto).',
@@ -84,9 +93,11 @@ export const DEFAULT_SERVICES = [
     aftercare: 'Prendre rdv pour le remplissage au bout de 3 à 4 semaines, Ne pas forcer sur la longueur',
     idealFor: 'Personnes aux ongles courts ou rongés, Celles qui recherchent des mains sophistiquées et allongées',
     expectedResult: 'Des ongles longs, symétriques et naturellement intégrés à la forme de vos doigts.',
+    active: true,
     sortOrder: 5,
   },
   {
+    id: 'svc-depose',
     name: 'Dépose',
     description: 'Dépose soigneuse du gel, acrylique ou semi-permanent sans abîmer l\'ongle naturel.',
     fullDescription: 'Une dépose professionnelle en douceur du gel, résine ou semi-permanent afin de préserver l\'intégrité et la santé de l\'ongle naturel. Elle se termine par un soin fortifiant et nourrissant.',
@@ -101,9 +112,11 @@ export const DEFAULT_SERVICES = [
     aftercare: 'Appliquer le sérum fortifiant pendant 7 jours après la dépose',
     idealFor: 'Pause entre deux poses de gel, Retour aux ongles naturels en toute sécurité',
     expectedResult: 'Des ongles naturels intacts, non affinés, lisses et réhydratés.',
+    active: true,
     sortOrder: 6,
   },
   {
+    id: 'svc-soin-mains',
     name: 'Soin des mains',
     description: 'Soin hydratant et nourrissant pour des mains douces et des cuticules soignées.',
     fullDescription: 'Un véritable rituel spa pour réparer les mains desséchées et fatiguées. Ce soin combine gommage aux cristaux, masque réparateur chaud et massage relaxant pour retrouver douceur et réconfort.',
@@ -118,9 +131,11 @@ export const DEFAULT_SERVICES = [
     aftercare: 'Renouveler l\'application de crème hydratante avant le coucher',
     idealFor: 'Mains sèches ou abîmées par le froid, Idée cadeau bien-être, Complément après manucure',
     expectedResult: 'Une peau repulpée, infiniment douce avec une sensation de détente et de confort.',
+    active: true,
     sortOrder: 7,
   },
   {
+    id: 'svc-soin-pieds',
     name: 'Soin des pieds',
     description: 'Pédicure complète avec gommage, hydratation et soin des ongles de pieds.',
     fullDescription: 'Offrez à vos pieds une beauté complète et une relaxation totale. Notre pédicure spa élimine les callosités, sublime les ongles de pieds et détend les tensions grâce à un gommage et un massage sous eau hydro-massante.',
@@ -135,6 +150,7 @@ export const DEFAULT_SERVICES = [
     aftercare: 'Hydrater les talons tous les soirs avec une crème pieds nourrissante',
     idealFor: 'Saison estivale et sandales, Personnes piétinant souvent, Moment de détente absolue',
     expectedResult: 'Des pieds doux, délassés, sans callosités et des ongles de pieds irréprochables.',
+    active: true,
     sortOrder: 8,
   },
 ];
