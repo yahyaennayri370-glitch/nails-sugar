@@ -183,23 +183,23 @@ export async function ensureAvailabilitySeeded() {
   ];
 
   for (const day of days) {
-    const existing = await prisma.availability.findUnique({
+    const avail = await prisma.availability.upsert({
       where: { dayOfWeek: day.dayOfWeek },
+      update: { isOpen: true, openTime: '10:00', closeTime: '20:00' },
+      create: day,
     });
 
-    if (!existing) {
-      const avail = await prisma.availability.create({ data: day });
+    const breaksCount = await prisma.break.count({
+      where: { availabilityId: avail.id },
+    });
+
+    if (breaksCount === 0) {
       await prisma.break.create({
         data: {
           availabilityId: avail.id,
           startTime: '13:00',
           endTime: '14:00',
         },
-      });
-    } else if (!existing.isOpen || !existing.openTime || !existing.closeTime) {
-      await prisma.availability.update({
-        where: { id: existing.id },
-        data: { isOpen: true, openTime: '10:00', closeTime: '20:00' },
       });
     }
   }

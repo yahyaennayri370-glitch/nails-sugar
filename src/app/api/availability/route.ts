@@ -58,11 +58,6 @@ export async function GET(req: NextRequest) {
 
     const openTime = availability?.openTime || '10:00';
     const closeTime = availability?.closeTime || '20:00';
-    const isOpen = availability ? availability.isOpen : true;
-
-    if (!isOpen) {
-      return NextResponse.json({ slots: [], closed: true });
-    }
 
     // Get blocked time slots
     const blockedSlots = await prisma.blockedTimeSlot.findMany({ where: { date } });
