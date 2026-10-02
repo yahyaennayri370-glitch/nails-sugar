@@ -5,6 +5,9 @@ import { prisma } from '@/lib/prisma';
 import { generateTimeSlots } from '@/lib/utils';
 import { ensureAvailabilitySeeded } from '@/lib/seed-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET /api/availability — get availability schedule or available slots for a date
 export async function GET(req: NextRequest) {
   await ensureAvailabilitySeeded();

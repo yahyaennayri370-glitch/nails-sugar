@@ -5,6 +5,9 @@ import { prisma } from '@/lib/prisma';
 import { sanitize } from '@/lib/utils';
 import { ensureServicesSeeded } from '@/lib/seed-utils';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET /api/services — list all services (public: active only, admin: all)
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
