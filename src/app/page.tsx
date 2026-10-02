@@ -7,6 +7,7 @@ import {
   ChevronUp, ArrowUpRight
 } from 'lucide-react';
 import { formatPrice, formatDuration, formatDate, STATUS_LABELS } from '@/lib/utils';
+import { DEFAULT_SERVICES } from '@/lib/seed-utils';
 
 /* ============================================================
    TYPES
@@ -110,15 +111,22 @@ export default function HomePage() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/services').then(r => r.json()),
-      fetch('/api/gallery').then(r => r.json()),
-      fetch('/api/settings').then(r => r.json()),
+      fetch('/api/services').then(r => r.json()).catch(() => []),
+      fetch('/api/gallery').then(r => r.json()).catch(() => []),
+      fetch('/api/settings').then(r => r.json()).catch(() => ({})),
     ]).then(([svc, gal, set]) => {
-      setServices(svc);
-      setGallery(gal);
-      setSettings(set);
+      if (Array.isArray(svc) && svc.length > 0) {
+        setServices(svc);
+      } else {
+        setServices(DEFAULT_SERVICES as unknown as Service[]);
+      }
+      if (Array.isArray(gal)) setGallery(gal);
+      if (set && typeof set === 'object') setSettings(set);
       setLoaded(true);
-    }).catch(() => setLoaded(true));
+    }).catch(() => {
+      setServices(DEFAULT_SERVICES as unknown as Service[]);
+      setLoaded(true);
+    });
   }, []);
 
   // Dismiss intro after animation

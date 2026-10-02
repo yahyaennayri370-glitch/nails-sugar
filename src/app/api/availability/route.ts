@@ -3,9 +3,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { generateTimeSlots } from '@/lib/utils';
+import { ensureAvailabilitySeeded } from '@/lib/seed-utils';
 
 // GET /api/availability — get availability schedule or available slots for a date
 export async function GET(req: NextRequest) {
+  await ensureAvailabilitySeeded();
+
   const { searchParams } = new URL(req.url);
   const date = searchParams.get('date');
   const serviceId = searchParams.get('serviceId');

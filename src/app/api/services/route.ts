@@ -3,11 +3,14 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { sanitize } from '@/lib/utils';
+import { ensureServicesSeeded } from '@/lib/seed-utils';
 
 // GET /api/services — list all services (public: active only, admin: all)
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const isAdmin = !!session;
+
+  await ensureServicesSeeded();
   
   const services = await prisma.service.findMany({
     where: isAdmin ? {} : { active: true },
