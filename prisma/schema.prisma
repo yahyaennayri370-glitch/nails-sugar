@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id               String        @id @default(cuid())
+  name             String
+  description      String
+  fullDescription  String?
+  category         String?
+  price            Float?
+  priceOnDemand    Boolean       @default(false)
+  duration         Int           // minutes
+  image            String?
+  included         String?       // Comma or newline separated items
+  benefits         String?       // Comma or newline separated benefits
+  beforeAdvice     String?
+  aftercare        String?
+  idealFor         String?
+  expectedResult   String?
+  active           Boolean       @default(true)
+  sortOrder        Int           @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  appointments     Appointment[]
+
+  @@index([active])
+}
+
+model Customer {
+  id           String        @id @default(cuid())
+  name         String
+  phone        String
+  email        String?
+  instagram    String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+
+  @@index([phone])
+}
+
+model Appointment {
+  id         String            @id @default(cuid())
+  customerId String
+  serviceId  String
+  date       String            // YYYY-MM-DD
+  startTime  String            // HH:mm
+  endTime    String            // HH:mm
+  status     String            @default("pending") // pending, confirmed, completed, cancelled
+  notes      String?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  customer   Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  service    Service           @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([date])
+  @@index([status])
+  @@index([customerId])
+  @@index([serviceId])
+  @@index([date, status])
+  @@index([date, startTime])
+}
+
+model Availability {
+  id        String   @id @default(cuid())
+  dayOfWeek Int      @unique // 0=Sunday, 1=Monday, ..., 6=Saturday
+  isOpen    Boolean  @default(false)
+  openTime  String?  // HH:mm
+  closeTime String?  // HH:mm
+  breaks    Break[]
+}
+
+model Break {
+  id             String       @id @default(cuid())
+  availabilityId String
+  startTime      String       // HH:mm
+  endTime        String       // HH:mm
+  availability   Availability @relation(fields: [availabilityId], references: [id], onDelete: Cascade)
+}
+
+model BlockedDate {
+  id     String @id @default(cuid())
+  date   String @unique // YYYY-MM-DD
+  reason String?
+}
+
+model BlockedTimeSlot {
+  id        String @id @default(cuid())
+  date      String // YYYY-MM-DD
+  startTime String // HH:mm
+  endTime   String // HH:mm
+  reason    String?
+
+  @@index([date])
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  filename  String
+  alt       String?
+  featured  Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
