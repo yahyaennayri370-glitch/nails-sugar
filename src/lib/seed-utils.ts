@@ -156,38 +156,51 @@ export const DEFAULT_SERVICES = [
 ];
 
 export async function ensureServicesSeeded() {
-  const count = await prisma.service.count();
-  if (count === 0) {
-    for (const service of DEFAULT_SERVICES) {
+  for (const service of DEFAULT_SERVICES) {
+    const existing = await prisma.service.findFirst({
+      where: {
+        OR: [
+          { id: service.id },
+          { name: service.name },
+        ],
+      },
+    });
+    if (!existing) {
       await prisma.service.create({ data: service });
     }
   }
 }
 
 export async function ensureAvailabilitySeeded() {
-  const count = await prisma.availability.count();
-  if (count === 0) {
-    const days = [
-      { dayOfWeek: 0, isOpen: false, openTime: null, closeTime: null },
-      { dayOfWeek: 1, isOpen: true, openTime: '10:00', closeTime: '20:00' },
-      { dayOfWeek: 2, isOpen: true, openTime: '10:00', closeTime: '20:00' },
-      { dayOfWeek: 3, isOpen: true, openTime: '10:00', closeTime: '20:00' },
-      { dayOfWeek: 4, isOpen: true, openTime: '10:00', closeTime: '20:00' },
-      { dayOfWeek: 5, isOpen: true, openTime: '10:00', closeTime: '20:00' },
-      { dayOfWeek: 6, isOpen: false, openTime: null, closeTime: null },
-    ];
+  const days = [
+    { dayOfWeek: 0, isOpen: true, openTime: '10:00', closeTime: '20:00' }, // Sunday
+    { dayOfWeek: 1, isOpen: true, openTime: '10:00', closeTime: '20:00' }, // Monday
+    { dayOfWeek: 2, isOpen: true, openTime: '10:00', closeTime: '20:00' }, // Tuesday
+    { dayOfWeek: 3, isOpen: true, openTime: '10:00', closeTime: '20:00' }, // Wednesday
+    { dayOfWeek: 4, isOpen: true, openTime: '10:00', closeTime: '20:00' }, // Thursday
+    { dayOfWeek: 5, isOpen: true, openTime: '10:00', closeTime: '20:00' }, // Friday
+    { dayOfWeek: 6, isOpen: true, openTime: '10:00', closeTime: '20:00' }, // Saturday
+  ];
 
-    for (const day of days) {
+  for (const day of days) {
+    const existing = await prisma.availability.findUnique({
+      where: { dayOfWeek: day.dayOfWeek },
+    });
+
+    if (!existing) {
       const avail = await prisma.availability.create({ data: day });
-      if (day.isOpen) {
-        await prisma.break.create({
-          data: {
-            availabilityId: avail.id,
-            startTime: '13:00',
-            endTime: '14:00',
-          },
-        });
-      }
+      await prisma.break.create({
+        data: {
+          availabilityId: avail.id,
+          startTime: '13:00',
+          endTime: '14:00',
+        },
+      });
+    } else if (!existing.isOpen || !existing.openTime || !existing.closeTime) {
+      await prisma.availability.update({
+        where: { id: existing.id },
+        data: { isOpen: true, openTime: '10:00', closeTime: '20:00' },
+      });
     }
   }
 }

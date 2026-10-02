@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { generateTimeSlots } from '@/lib/utils';
-import { ensureAvailabilitySeeded } from '@/lib/seed-utils';
+import { DEFAULT_SERVICES, ensureAvailabilitySeeded } from '@/lib/seed-utils';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -18,8 +18,28 @@ export async function GET(req: NextRequest) {
 
   // If date and serviceId provided, return available time slots (public)
   if (date && serviceId) {
-    const service = await prisma.service.findUnique({ where: { id: serviceId } });
-    if (!service || !service.active) {
+    let service = await prisma.service.findUnique({ where: { id: serviceId } });
+
+    if (!service) {
+      service = await prisma.service.findFirst({
+        where: {
+          OR: [
+            { name: { equals: serviceId } },
+            { id: { equals: serviceId } },
+          ],
+        },
+      });
+    }
+
+    // Fallback lookup from default services
+    const fallbackService = DEFAULT_SERVICES.find(
+      s => s.id === serviceId || s.name.toLowerCase() === serviceId.toLowerCase()
+    );
+
+    const duration = service?.duration || fallbackService?.duration || 45;
+    const active = service ? service.active : true;
+
+    if (!active) {
       return NextResponse.json({ slots: [], error: 'Service non disponible' });
     }
 
@@ -31,12 +51,16 @@ export async function GET(req: NextRequest) {
 
     // Get day availability
     const dayOfWeek = new Date(date + 'T00:00:00').getDay();
-    const availability = await prisma.availability.findUnique({
+    let availability = await prisma.availability.findUnique({
       where: { dayOfWeek },
       include: { breaks: true },
     });
 
-    if (!availability || !availability.isOpen || !availability.openTime || !availability.closeTime) {
+    const openTime = availability?.openTime || '10:00';
+    const closeTime = availability?.closeTime || '20:00';
+    const isOpen = availability ? availability.isOpen : true;
+
+    if (!isOpen) {
       return NextResponse.json({ slots: [], closed: true });
     }
 
@@ -52,11 +76,13 @@ export async function GET(req: NextRequest) {
       select: { startTime: true, endTime: true },
     });
 
+    const breaks = availability?.breaks ? availability.breaks.map((b) => ({ startTime: b.startTime, endTime: b.endTime })) : [{ startTime: '13:00', endTime: '14:00' }];
+
     const slots = generateTimeSlots(
-      availability.openTime,
-      availability.closeTime,
-      service.duration,
-      availability.breaks.map((b) => ({ startTime: b.startTime, endTime: b.endTime })),
+      openTime,
+      closeTime,
+      duration,
+      breaks,
       blockedSlots.map((b) => ({ startTime: b.startTime, endTime: b.endTime })),
       existingAppointments
     );

@@ -11,6 +11,7 @@ import {
   isValidDate,
 } from '@/lib/validation';
 import { logger } from '@/lib/logger';
+import { DEFAULT_SERVICES } from '@/lib/seed-utils';
 
 // GET /api/appointments — list appointments (admin only)
 export async function GET(req: NextRequest) {
@@ -102,7 +103,43 @@ export async function POST(req: NextRequest) {
     // This ensures only one booking can be created for an overlapping time slot
     const result = await prisma.$transaction(async (tx) => {
       // Get service — ALWAYS use server-side duration/price
-      const service = await tx.service.findUnique({ where: { id: serviceId } });
+      let service = await tx.service.findUnique({ where: { id: serviceId } });
+      if (!service) {
+        service = await tx.service.findFirst({
+          where: {
+            OR: [
+              { name: { equals: serviceId } },
+              { id: { equals: serviceId } },
+            ],
+          },
+        });
+      }
+      if (!service) {
+        const fallback = DEFAULT_SERVICES.find(s => s.id === serviceId || s.name.toLowerCase() === serviceId.toLowerCase());
+        if (fallback) {
+          service = await tx.service.create({
+            data: {
+              id: fallback.id,
+              name: fallback.name,
+              description: fallback.description,
+              fullDescription: fallback.fullDescription || null,
+              category: fallback.category || null,
+              price: fallback.price,
+              priceOnDemand: fallback.priceOnDemand,
+              duration: fallback.duration,
+              image: fallback.image,
+              included: fallback.included || null,
+              benefits: fallback.benefits || null,
+              beforeAdvice: fallback.beforeAdvice || null,
+              aftercare: fallback.aftercare || null,
+              idealFor: fallback.idealFor || null,
+              expectedResult: fallback.expectedResult || null,
+              sortOrder: fallback.sortOrder,
+              active: true,
+            },
+          });
+        }
+      }
       if (!service || !service.active) {
         return { error: 'Service non disponible', status: 400 };
       }
