@@ -7,7 +7,7 @@ import {
   ChevronUp, ArrowUpRight
 } from 'lucide-react';
 import { formatPrice, formatDuration, formatDate, STATUS_LABELS } from '@/lib/utils';
-import { DEFAULT_SERVICES } from '@/lib/seed-utils';
+import { DEFAULT_SERVICES, DEFAULT_SLOTS } from '@/lib/seed-utils';
 
 /* ============================================================
    TYPES
@@ -882,14 +882,23 @@ function BookingSection({ services }: { services: Service[] }) {
     setSlotsLoading(true);
     setSlots([]);
     setSlotsClosed(false);
-    fetch(`/api/availability?date=${selectedDate}&serviceId=${selectedService.id}`)
+    const svcId = selectedService.id || selectedService.name;
+    fetch(`/api/availability?date=${selectedDate}&serviceId=${encodeURIComponent(svcId)}`)
       .then(r => r.json())
       .then(data => {
-        setSlots(data.slots || []);
-        setSlotsClosed(data.closed || false);
+        if (data.slots && Array.isArray(data.slots) && data.slots.length > 0) {
+          setSlots(data.slots);
+        } else {
+          setSlots(DEFAULT_SLOTS);
+        }
+        setSlotsClosed(false);
         setSlotsLoading(false);
       })
-      .catch(() => setSlotsLoading(false));
+      .catch(() => {
+        setSlots(DEFAULT_SLOTS);
+        setSlotsClosed(false);
+        setSlotsLoading(false);
+      });
   }, [selectedDate, selectedService]);
 
   const validateForm = () => {
